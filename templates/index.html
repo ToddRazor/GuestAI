@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Подсчет гостей в кафе</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f2f4f7;
+            color: #222;
+        }
+
+        header {
+            background-color: #1f4e79;
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 25px;
+        }
+
+        .container {
+            width: 1100px;
+            max-width: 95%;
+            margin: 0 auto;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            margin-top: 8px;
+            font-size: 15px;
+            color: #dce8f5;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .card {
+            background-color: white;
+            border: 1px solid #d7dce2;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            margin-top: 0;
+            font-size: 21px;
+            color: #1f4e79;
+        }
+
+        .description {
+            color: #555;
+            line-height: 1.5;
+            margin-bottom: 18px;
+        }
+
+        input[type="file"] {
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: #1f4e79;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        button:hover {
+            background-color: #163b5c;
+        }
+
+        button:disabled {
+            background-color: #8da9bf;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background-color: #555f66;
+        }
+
+        .btn-green {
+            background-color: #2e7d32;
+        }
+
+        .btn-green:hover {
+            background-color: #245f27;
+        }
+
+        .btn-red {
+            background-color: #b23b3b;
+        }
+
+        .btn-red:hover {
+            background-color: #8f2f2f;
+        }
+
+        .status {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 5px;
+            background-color: #eef5ff;
+            border: 1px solid #bdd7ee;
+            color: #1f4e79;
+        }
+
+        .status.error {
+            background-color: #ffecec;
+            border-color: #f0b5b5;
+            color: #a40000;
+        }
+
+        .status.success {
+            background-color: #edf8ed;
+            border-color: #b7dfb7;
+            color: #245f27;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .stat-box {
+            background-color: #f8f9fa;
+            border: 1px solid #d7dce2;
+            border-radius: 6px;
+            padding: 14px;
+        }
+
+        .stat-title {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1f4e79;
+        }
+
+        .preview {
+            margin-top: 15px;
+            display: none;
+        }
+
+        .preview img {
+            max-width: 100%;
+            max-height: 260px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        .result-area {
+            min-height: 350px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #fafafa;
+            border: 1px dashed #bbb;
+            border-radius: 6px;
+            text-align: center;
+            color: #666;
+            padding: 15px;
+        }
+
+        #resultImage {
+            max-width: 100%;
+            max-height: 520px;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .history-card {
+            grid-column: 1 / 3;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        th, td {
+            border: 1px solid #d7dce2;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #eef2f5;
+            color: #333;
+        }
+
+        tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        .footer {
+            margin: 20px 0 35px;
+            color: #666;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        @media (max-width: 850px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .history-card {
+                grid-column: 1;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<header>
+    <div class="container">
+        <h1>Подсчет количества гостей за столом в кафе</h1>
+        <div class="subtitle">
+            Веб-приложение для обработки изображений с помощью предобученной модели YOLOv8
+        </div>
+    </div>
+</header>
+
+<main class="container">
+    <div class="main-grid">
+
+        <section class="card">
+            <h2>1. Загрузка изображения</h2>
+
+            <p class="description">
+                Выберите фотографию кафе или стола с гостями. После запуска обработки
+                нейросеть найдет людей на изображении и посчитает их количество.
+            </p>
+
+            <input type="file" id="imageInput" accept="image/*">
+
+            <button id="processButton" onclick="processImage()">Запустить обработку</button>
+            <button class="btn-secondary" onclick="resetForm()">Сбросить</button>
+
+            <div class="preview" id="previewBlock">
+                <p><b>Предпросмотр выбранного изображения:</b></p>
+                <img id="previewImage" src="" alt="Предпросмотр">
+            </div>
+
+            <div id="statusBlock" class="status">
+                Файл пока не выбран.
+            </div>
+
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-title">Найдено гостей</div>
+                    <div class="stat-value" id="peopleCount">—</div>
+                </div>
+
+                <div class="stat-box">
+                    <div class="stat-title">Время обработки</div>
+                    <div class="stat-value" id="processingTime">—</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>2. Результат распознавания</h2>
+
+            <div class="result-area" id="resultArea">
+                <span id="emptyText">После обработки здесь появится изображение с рамками.</span>
+                <img id="resultImage" src="" alt="Результат обработки">
+            </div>
+        </section>
+
+        <section class="card history-card">
+            <div class="history-header">
+                <div>
+                    <h2>3. История обработок</h2>
+                    <p class="description" style="margin-bottom: 0;">
+                        Здесь отображаются последние изображения, обработанные системой.
+                    </p>
+                </div>
+
+                <div>
+                    <button class="btn-secondary" onclick="loadHistory()">Обновить историю</button>
+                    <button class="btn-green" onclick="downloadExcel()">Скачать Excel-отчет</button>
+                    <button class="btn-red" onclick="clearHistory()">Очистить историю</button>
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Дата и время</th>
+                    <th>Исходный файл</th>
+                    <th>Количество гостей</th>
+                    <th>Время обработки</th>
+                </tr>
+                </thead>
+
+                <tbody id="historyTable">
+                <tr>
+                    <td colspan="5">История пока не загружена.</td>
+                </tr>
+                </tbody>
+            </table>
+        </section>
+
+    </div>
+
+    <div class="footer">
+        Flask · YOLOv8 · OpenCV · SQLite · openpyxl
+    </div>
+</main>
+
+<script>
+    const imageInput = document.getElementById("imageInput");
+    const previewBlock = document.getElementById("previewBlock");
+    const previewImage = document.getElementById("previewImage");
+    const statusBlock = document.getElementById("statusBlock");
+    const peopleCount = document.getElementById("peopleCount");
+    const processingTime = document.getElementById("processingTime");
+    const resultImage = document.getElementById("resultImage");
+    const emptyText = document.getElementById("emptyText");
+    const processButton = document.getElementById("processButton");
+
+    imageInput.addEventListener("change", function () {
+        const file = imageInput.files[0];
+
+        if (!file) {
+            setStatus("Файл пока не выбран.", "normal");
+            return;
+        }
+
+        if (!file.type.startsWith("image/")) {
+            setStatus("Ошибка: нужно выбрать изображение.", "error");
+            return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = function (event) {
+            previewImage.src = event.target.result;
+            previewBlock.style.display = "block";
+        };
+
+        reader.readAsDataURL(file);
+
+        setStatus("Изображение выбрано. Нажмите кнопку обработки.", "normal");
+    });
+
+    function setStatus(text, type) {
+        statusBlock.className = "status";
+
+        if (type === "error") {
+            statusBlock.classList.add("error");
+        }
+
+        if (type === "success") {
+            statusBlock.classList.add("success");
+        }
+
+        statusBlock.innerHTML = text;
+    }
+
+    async function processImage() {
+        if (imageInput.files.length === 0) {
+            setStatus("Ошибка: сначала выберите изображение.", "error");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("image", imageInput.files[0]);
+
+        processButton.disabled = true;
+        processButton.innerText = "Обработка...";
+        setStatus("Изображение обрабатывается. Подождите несколько секунд.", "normal");
+
+        try {
+            const response = await fetch("/process", {
+                method: "POST",
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.error) {
+                setStatus("Ошибка: " + data.error, "error");
+                return;
+            }
+
+            peopleCount.innerText = data.people_count;
+            processingTime.innerText = data.processing_time + " сек.";
+
+            resultImage.src = data.result_image + "?t=" + new Date().getTime();
+            resultImage.style.display = "block";
+            emptyText.style.display = "none";
+
+            setStatus(
+                "Обработка завершена. Найдено гостей: <b>" +
+                data.people_count +
+                "</b>.",
+                "success"
+            );
+
+            loadHistory();
+
+        } catch (error) {
+            console.error(error);
+            setStatus("Ошибка: сервер не ответил на запрос.", "error");
+        } finally {
+            processButton.disabled = false;
+            processButton.innerText = "Запустить обработку";
+        }
+    }
+
+    async function loadHistory() {
+        const historyTable = document.getElementById("historyTable");
+
+        try {
+            const response = await fetch("/history");
+            const history = await response.json();
+
+            historyTable.innerHTML = "";
+
+            if (history.length === 0) {
+                historyTable.innerHTML = "<tr><td colspan='5'>История пока пустая.</td></tr>";
+                return;
+            }
+
+            history.forEach(function (item) {
+                const row = document.createElement("tr");
+
+                row.innerHTML =
+                    "<td>" + item.id + "</td>" +
+                    "<td>" + item.timestamp + "</td>" +
+                    "<td>" + item.original_filename + "</td>" +
+                    "<td>" + item.people_count + "</td>" +
+                    "<td>" + item.processing_time + " сек.</td>";
+
+                historyTable.appendChild(row);
+            });
+
+        } catch (error) {
+            console.error(error);
+            historyTable.innerHTML =
+                "<tr><td colspan='5'>Не удалось загрузить историю.</td></tr>";
+        }
+    }
+
+    function resetForm() {
+        imageInput.value = "";
+
+        previewImage.src = "";
+        previewBlock.style.display = "none";
+
+        resultImage.src = "";
+        resultImage.style.display = "none";
+        emptyText.style.display = "inline";
+
+        peopleCount.innerText = "—";
+        processingTime.innerText = "—";
+
+        setStatus("Файл пока не выбран.", "normal");
+    }
+
+    function downloadExcel() {
+        window.location.href = "/export_excel";
+    }
+
+    async function clearHistory() {
+        const confirmClear = confirm(
+            "Вы действительно хотите очистить историю обработок и удалить сохраненные изображения?"
+        );
+
+        if (!confirmClear) {
+            return;
+        }
+
+        try {
+            const response = await fetch("/clear_history", {
+                method: "POST"
+            });
+
+            const data = await response.json();
+
+            if (data.error) {
+                alert("Ошибка при очистке истории: " + data.error);
+                return;
+            }
+
+            resetForm();
+            loadHistory();
+
+            alert("История обработок очищена.");
+
+        } catch (error) {
+            console.error(error);
+            alert("Ошибка: сервер не ответил на запрос очистки.");
+        }
+    }
+
+    window.onload = loadHistory;
+</script>
+</body>
+</html>

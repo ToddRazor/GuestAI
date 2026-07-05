@@ -1,0 +1,27 @@
+# Виртуальное окружение Python
+.venv/
+
+# Кэш Python
+__pycache__/
+*.pyc
+
+# База данных и временные отчеты
+history.db
+report.xlsx
+excel_report.xlsx
+*.xlsx
+
+# Загруженные и обработанные изображения
+uploads/
+static/results/
+
+# Модели YOLO, которые скачиваются автоматически
+yolov8n.pt
+yolov8s.pt
+
+# Настройки PyCharm
+.idea/
+
+# Системные файлы
+.DS_Store
+Thumbs.db
